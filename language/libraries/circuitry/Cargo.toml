@@ -1,0 +1,33 @@
+[package]
+name = "woodoo-circuitry"
+description = "Library of data structures and algorithms for algebraic circuits manipulation"
+authors = ["Handcrafted since 2022 by Fumbo sorcerers"]
+version = "0.1.0"
+edition = "2021"
+keywords = [
+    "woodoo",
+    "fumbo",
+    "language",
+    "model",
+    "algebraic-model",
+    "arithmetic-circuit",
+    "algebraic-structure",
+    "verifiable-computing",
+    "snark",
+    "stark",
+    "zero-knoweledge-proof",
+    "cryptography",
+    "zkp"
+]
+readme = "README.md"
+license = "Apache-2.0"
+
+[dependencies]
+
+# Serialization dependencies
+serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+
+# User interaction (UI) testing dependencies
+trybuild = "1.0.56"

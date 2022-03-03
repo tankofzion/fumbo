@@ -1,0 +1,24 @@
+[package]
+name = "woodoo-merkletree-example"
+description = "Merkle tree membership tracking example"
+authors = [ "Handcrafted since 2022 by Fumbo sorcerers"]
+version = "0.1.0"
+edition = "2021"
+keywords = [
+    "woodoo",
+    "fumbo",
+    "zerocash",
+    "snark",
+    "circuit"
+]
+readme = "README.md"
+license = "Apache-2.0"
+
+
+[dependencies]
+
+# Woodoo dependencies
+woodoo-compiler = { path = "../../modules/compiler", version = "0.1.0" }
+
+# Cryptographic primitives
+ark-crypto-primitives = { version = "^0.3.0", default-features = true }

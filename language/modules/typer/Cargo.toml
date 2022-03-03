@@ -1,0 +1,19 @@
+[package]
+name = "woodoo-typer"
+description = "Woodoo language type checker"
+authors = ["Handcrafted since 2022 by Fumbo sorcerers"]
+version = "0.1.0"
+edition = "2021"
+keywords = [
+    "fumbo",
+    "compiler",
+    "language",
+    "type-checker",
+    "dependent-type",
+    "dsl",
+]
+
+readme = "README.md"
+license = "Apache-2.0"
+
+[dependencies]

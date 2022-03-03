@@ -1,0 +1,102 @@
+name: fumbo
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2.3.4
+        with:
+          fetch-depth: 1
+
+      - uses: actions-rs/toolchain@v1.0.7
+        with:
+          toolchain: stable
+
+      - name: Mount bazel cache
+        uses: actions/cache@v2.1.5
+        with:
+          path: ~/.cache/bazel
+          key: bazel-${{ hashFiles('.bazelversion') }}
+
+      - name: Mount cargo cache
+        uses: actions/cache@v2.1.5
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            cargo/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('cargo/**/Cargo.lock') }}
+
+      - name: Mount tools
+        uses: actions/cache@v2.1.5
+        with:
+          path: |
+            tools/bin/
+            tools/.crates.toml
+            tools/.crates2.json
+          key: ${{ runner.os }}-tools-${{ hashFiles('tools/scripts/bootstrap.sh') }}
+
+      - name: Bootstrap
+        run: ./tools/scripts/bootstrap.sh
+
+      - name: Build/Test
+        run: ./tools/ci/ci-test.sh
+
+      - name: Collect artifacts
+        # TODO: remove when github actions support symlinks
+        run: ./tools/ci/ci-collect.sh
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: ./artifacts/test-results/
+          if-no-files-found: error
+
+      - name: Upload godot
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot
+          path: ./artifacts/debs/src/cmd/godot/godot-debian.deb
+          if-no-files-found: error
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        if: github.ref == 'refs/heads/main'
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: latest
+          prerelease: true
+          title: "Development Build"
+          files: |
+            LICENSE
+            ./artifacts/debs/**/*
+
+  publish-test-results:
+    name: "Publish Test Results"
+    needs: build
+    runs-on: ubuntu-latest
+    # the build-and-test job might be skipped, we don't need to run this job then
+    if: >
+      github.event.workflow_run.conclusion != 'skipped' && (
+      github.event.sender.login == 'dependabot[bot]' ||
+      github.event.workflow_run.head_repository.full_name != github.repository
+      )
+
+    steps:
+      - name: Download
+        uses: actions/download-artifact@v2
+        with:
+          path: test-results
+
+      - name: Publish
+        uses: EnricoMi/publish-unit-test-result-action/composite@v1.17
+        with:
+          check_name: Test Results
+          files: test-results/**/*.xml

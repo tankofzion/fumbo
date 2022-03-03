@@ -1,0 +1,35 @@
+[package]
+name = "woodoo-compiler"
+description = "Woodoo language compiler"
+authors = ["Handcrafted since 2022 by Fumbo sorcerers"]
+version = "0.1.0"
+edition = "2021"
+keywords = [
+    "fumbo",
+    "compiler",
+    "language",
+    "dsl",
+    "cli",
+    "shell"
+]
+readme = "README.md"
+license = "Apache-2.0"
+
+default-run = "woodoo"
+
+# Compiler shell executable
+[[bin]]
+name = "woodoo"
+path = "src/shell.rs"
+
+# Compiler driver library
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+
+# Third-party dependencies
+structopt = "0.3.26"
+
+# Woodoo dependencies
+woodoo-parser = { path = "../parser", version = "0.1.0" }

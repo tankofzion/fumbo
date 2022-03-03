@@ -1,0 +1,57 @@
+########################################################################################################################
+# Fumbo                                                                                                                #
+# Verifiable computing toolkit                                                                                         #
+#                                                                                                                      #
+# Handcrafted since 2022 by Fumbo sorcerers                                                                            #
+# All rights reserved                                                                                                  #
+########################################################################################################################
+
+[workspace]
+resolver = "2"
+members = [
+
+    # Language modules
+    "language/modules/compiler",                # Language compiler (or CLI)
+    "language/modules/parser",                  # Language syntax analyzer
+    "language/modules/typer",                   # Type checking and inference
+    "language/modules/evaluator",               # Type-driven program semantics analyzer
+    "language/modules/optimizer",               # Multi-strategies arithmetic circuits optimizer
+
+    # Language examples
+    "language/examples/merkletree",             # Check Merkle tree membership
+    "language/examples/sudoku",                 # Proof of a Sudoku solution
+    "language/examples/square",                 # Mystic square (or 15-puzzle) solution proof
+    "language/examples/zerocash",               # ZeroCash Pour circuit
+    "language/examples/portfolio"               # Portfolio valuation
+]
+
+# Development compiler settings
+[profile.dev]
+opt-level = 1                                   # Basic optimizations are applied
+panic = "abort"
+split-debuginfo = "unpacked"                    # Place debug information adjacent to the executable (on MacOS 'unpacked'
+                                                # is the default)
+
+# Releasing compiler settings
+[profile.release]
+opt-level = 3                                   # Apply all code optimizations (longer compilation)
+lto = "thin"                                    # Mid LLVM link-time optimization
+incremental = true
+panic = 'unwind'                                # Unfold calling stack (if platform supports it)
+
+# Benchmarking compiler settings
+[profile.bench]
+opt-level = 3
+debug = false
+rpath = false
+lto = "thin"
+incremental = true
+debug-assertions = false
+
+# Testing compiler settings
+[profile.test]
+opt-level = 3
+lto = "thin"
+incremental = true
+debug-assertions = true
+debug = true
