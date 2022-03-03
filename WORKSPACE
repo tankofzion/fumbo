@@ -26,7 +26,7 @@ go_rules_dependencies()
 go_register_toolchains(version = "1.16.2")
 
 load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
-load("//:third_party/repositories.bzl", "go_repositories")
+load("//:tooling/bazel/repositories.bzl", "go_repositories")
 
 # gazelle:repository_macro third_party/repositories.bzl%go_repositories
 go_repositories()
@@ -106,6 +106,7 @@ load("@blackjack//:workspace.bzl", "blackjack_cargo")
 
 blackjack_cargo()
 
-load("//src:cargo_dependencies.bzl", "cargo_dependencies")
+#load("//src:cargo_dependencies.bzl", "cargo_dependencies")
+load("//:language/modules/parser:cargo_dependencies.bzl", "cargo_dependencies")
 
 cargo_dependencies()
