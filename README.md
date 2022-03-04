@@ -23,9 +23,13 @@ For doing so, continuous integration tasks (i.e. compilation, packaging, deliver
 and [Bazel](https://bazel.build/). So that to facilitate the handling of Bazel, the [Bazelisk](https://github.com/bazelbuild/bazelisk)
 tool is used. 
 
+### Dependencies management
+
 The [Blackjack](https://github.com/wildarch/blackjack) tool builds Cargo dependencies using Bazel. As it relies on standard
-`Cargo.toml` configuration files, he project can be built using both Cargo and Bazel (see [WORKSPACE](./WORKSPACE) and 
-[BUILD.bazel](./BUILD.bazel) for more information on Blackjack's configuration).
+`Cargo.toml` configuration files, the project can be built using both Cargo and Bazel (see [WORKSPACE](./WORKSPACE) and 
+[BUILD.bazel](./BUILD) for more information on Blackjack's configuration). When you modify dependencies in a `Cargo.toml`
+file, hence modifying the dependency graph, simply run again `bazelisk run //:blackjack` to generate new `cargo_dependencies.bzl`
+files.
 
 ### Local build
 

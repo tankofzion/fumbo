@@ -10,39 +10,39 @@ http_archive(
     ],
 )
 
-http_archive(
-    name = "bazel_gazelle",
-    sha256 = "62ca106be173579c0a167deb23358fdfe71ffa1e4cfdddf5582af26520f1c66f",
-    urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/bazel-gazelle/releases/download/v0.23.0/bazel-gazelle-v0.23.0.tar.gz",
-        "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.23.0/bazel-gazelle-v0.23.0.tar.gz",
-    ],
-)
+# http_archive(
+#     name = "bazel_gazelle",
+#     sha256 = "62ca106be173579c0a167deb23358fdfe71ffa1e4cfdddf5582af26520f1c66f",
+#     urls = [
+#         "https://mirror.bazel.build/github.com/bazelbuild/bazel-gazelle/releases/download/v0.23.0/bazel-gazelle-v0.23.0.tar.gz",
+#         "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.23.0/bazel-gazelle-v0.23.0.tar.gz",
+#     ],
+# )
 
-load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
+# load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
 
-go_rules_dependencies()
+# go_rules_dependencies()
 
-go_register_toolchains(version = "1.16.2")
+#go_register_toolchains(version = "1.16.2")
 
-load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
-load("//:tooling/bazel/repositories.bzl", "go_repositories")
+#load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
+#load("//:tooling/bazel/repositories.bzl", "go_repositories")
 
 # gazelle:repository_macro third_party/repositories.bzl%go_repositories
-go_repositories()
+#go_repositories()
 
-gazelle_dependencies()
+#gazelle_dependencies()
 
-http_archive(
-    name = "com_google_protobuf",
-    sha256 = "1c744a6a1f2c901e68c5521bc275e22bdc66256eeb605c2781923365b7087e5f",
-    strip_prefix = "protobuf-3.13.0",
-    urls = ["https://github.com/protocolbuffers/protobuf/archive/v3.13.0.zip"],
-)
+#http_archive(
+#    name = "com_google_protobuf",
+#    sha256 = "1c744a6a1f2c901e68c5521bc275e22bdc66256eeb605c2781923365b7087e5f",
+#    strip_prefix = "protobuf-3.13.0",
+#    urls = ["https://github.com/protocolbuffers/protobuf/archive/v3.13.0.zip"],
+#)
 
-load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+#load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
-protobuf_deps()
+#protobuf_deps()
 
 http_archive(
     name = "com_github_bazelbuild_buildtools",
@@ -51,15 +51,38 @@ http_archive(
     url = "https://github.com/bazelbuild/buildtools/archive/3.5.0.zip",
 )
 
-git_repository(
-    name = "com_github_aignas_rules_shellcheck",
-    commit = "3497c019704c295f0cb2ea9b4dcd3d0be73703ef",
-    remote = "https://github.com/aignas/rules_shellcheck.git",
+#git_repository(
+#    name = "com_github_aignas_rules_shellcheck",
+#    commit = "3497c019704c295f0cb2ea9b4dcd3d0be73703ef",
+#    remote = "https://github.com/aignas/rules_shellcheck.git",
+#)
+
+#load("@com_github_aignas_rules_shellcheck//:deps.bzl", "shellcheck_dependencies")
+
+#shellcheck_dependencies()
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Cargo raze rules
+# ----------------------------------------------------------------------------------------------------------------------
+
+http_archive(
+    name = "cargo_raze",
+    sha256 = "c664e258ea79e7e4ec2f2b57bca8b1c37f11c8d5748e02b8224810da969eb681",
+    strip_prefix = "cargo-raze-0.11.0",
+    url = "https://github.com/google/cargo-raze/archive/v0.11.0.tar.gz",
 )
 
-load("@com_github_aignas_rules_shellcheck//:deps.bzl", "shellcheck_dependencies")
+load("@cargo_raze//:repositories.bzl", "cargo_raze_repositories")
 
-shellcheck_dependencies()
+cargo_raze_repositories()
+
+load("@cargo_raze//:transitive_deps.bzl", "cargo_raze_transitive_deps")
+
+cargo_raze_transitive_deps()
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Rust rules
+# ----------------------------------------------------------------------------------------------------------------------
 
 git_repository(
     name = "rules_rust",
@@ -91,10 +114,7 @@ rules_pkg_dependencies()
 
 load("@rules_rust//rust:repositories.bzl", "rust_repositories")
 
-rust_repositories(
-    edition = "2021",
-    version = "1.59.0",
-)
+rust_repositories( edition = "2021", version = "1.59.0" )
 
 git_repository(
     name = "blackjack",

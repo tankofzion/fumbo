@@ -8,25 +8,27 @@ on:
 
 jobs:
   build:
+    # Virtual environment (note that Bazel and Bazelisk are already supported in virtual environments)
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@latest
         with:
           fetch-depth: 1
 
-      - uses: actions-rs/toolchain@v1.0.7
+      - uses: actions-rs/toolchain@latest
         with:
           toolchain: stable
 
-      - name: Mount bazel cache
-        uses: actions/cache@v2.1.5
+        # Cache and restore Bazel/Bazelisk downloads
+      - name: Restore Bazel/Bazelisk cache
+        uses: actions/cache@latest
         with:
           path: ~/.cache/bazel
           key: bazel-${{ hashFiles('.bazelversion') }}
 
-      - name: Mount cargo cache
-        uses: actions/cache@v2.1.5
+      - name: Restore Cargo cache
+        uses: actions/cache@latest
         with:
           path: |
             ~/.cargo/registry
@@ -35,7 +37,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('cargo/**/Cargo.lock') }}
 
       - name: Mount tools
-        uses: actions/cache@v2.1.5
+        uses: actions/cache@latest
         with:
           path: |
             tools/bin/
@@ -54,14 +56,14 @@ jobs:
         run: ./tools/ci/ci-collect.sh
 
       - name: Upload test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@latest
         with:
           name: test-results
           path: ./artifacts/test-results/
           if-no-files-found: error
 
       - name: Upload godot
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@latest
         with:
           name: godot
           path: ./artifacts/debs/src/cmd/godot/godot-debian.deb
@@ -73,7 +75,7 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: latest
           prerelease: true
-          title: "Development Build"
+          title: "Development build"
           files: |
             LICENSE
             ./artifacts/debs/**/*
@@ -91,12 +93,12 @@ jobs:
 
     steps:
       - name: Download
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@latest
         with:
           path: test-results
 
       - name: Publish
-        uses: EnricoMi/publish-unit-test-result-action/composite@v1.17
+        uses: EnricoMi/publish-unit-test-result-action/composite@latest
         with:
           check_name: Test Results
           files: test-results/**/*.xml
