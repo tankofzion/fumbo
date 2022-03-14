@@ -1,34 +1,112 @@
+########################################################################################################################
+# Fumbo                                                                                                                #
+# Verifiable computing toolkit                                                                                         #
+#                                                                                                                      #
+# Handcrafted since 2022 by Fumbo sorcerers                                                                            #
+# All rights reserved                                                                                                  #
+########################################################################################################################
+
+# NOTE:
+# This 'Makefile' is used by 'cargo-make' tool (see https://github.com/sagiegurari/cargo-make). It defines various tasks
+# for building software artefacts.
+# When executing a task from the project's workspace directory (or from the directory where the 'WORKSPACE' file resides),
+# cargo-make visits every workspace member and run the task there. In case you want to execute a task only for a specific
+# workspace member, you must pass the '--no-workspace' flag, like for instance, 'cargo make --no-workspace blackjack'.
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Cleaning tasks
+# ----------------------------------------------------------------------------------------------------------------------
+
 [tasks.clean]
+description = "Clean project up (removing binaries and other compilation products)"
+dependencies = [
+    "cargo-clean",
+    "bazel-clean"
+]
+
+[tasks.cargo-clean]
 command = "cargo"
 args = ["clean"]
 
-[tasks.build-with-cargo]
+[tasks.bazel-clean]
+command = "bazelisk"
+args = ["clean"]
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Project building tasks
+# ----------------------------------------------------------------------------------------------------------------------
+
+[tasks.build]
+description = "Build all project components (i.e. packages, documents, ...)"
+dependencies = [
+    "build-code",
+    "build-book"
+]
+
+[tasks.build-code]
+dependencies = ["build-code-with-bazel"]
+
+[tasks.build-code-with-bazel]
+command = "bazelisk"
+args = ["build", "--remote_http_cache=http://localhost:7777", "..."]
+dependencies = ["clean"]
+
+[tasks.build-code-with-cargo]
 command = "cargo"
 args = ["build"]
 dependencies = ["clean"]
 
-[tasks.build-with-act]
+[tasks.build-code-with-act]
 command = "act"
 args = ["--job build"]
 dependencies = ["clean"]
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Documents processing tasks
+# ----------------------------------------------------------------------------------------------------------------------
+
+[tasks.build-book]
+description = "Build the 'Fumbo in Depth' book (see ./documents/book)"
+command = "mdbook"
+args = ["build", "./documents/book"]
+
+[tasks.serve-book]
+description = "Display the 'Fumbo in Depth' book in a browser"
+dependencies = ["build-book"]
+command = "mdbook"
+args = ["serve", "./documents/book"]
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Project testing tasks
+# ----------------------------------------------------------------------------------------------------------------------
 
 [tasks.test]
 command = "cargo"
 args = ["test"]
 dependencies = ["clean"]
 
-[tasks.run-raze]
+# ----------------------------------------------------------------------------------------------------------------------
+# Project setting tasks
+# ----------------------------------------------------------------------------------------------------------------------
+
+# Generate Bazel BUILD files
+#
+# Using Cargo raze (see https://github.com/google/cargo-raze), this task aims at generating the Bazel BUILD scripts (from
+# Rust Cargo.toml files) for each project's member. This task is usually run once when setting up the project and must
+# be executed with '--no-workspace' flag, like this: 'cargo make --no-workspace generate-build-files'
+[tasks.generate-build-files]
+description = "Generate Bazel BUILD scripts from Cargo.toml files using Raze tool"
 command = "bazelisk"
 args = ["run", "@cargo_raze//:raze", "--", "--manifest-path=$$PWD/language/modules/parser/Cargo.toml"]
-dependencies = ["clean"]
 
-[tasks.run-blackjack]
-description = "Build Rust dependencies graph"
+# Generate Bazel targets for crates defined in 'cargo.lock' file
+#
+# Using 'Blackjack' behind the scene (see https://github.com/wildarch/blackjack), this tasks generate a file called
+# 'cargo_dependencies.bzl' which contains Bazel targets for crates that are defined in 'cargo.lock' file.
+# This task must not be executed for each project member (see the NOTE at top of this file) and hence, must be executed
+# with the '--no-workspace' flag, like this: 'cargo make --no-workspace resolve-dependencies'.
+[tasks.resolve-dependencies]
+description = "Generate Bazel targets for crates definined in 'cargo.lock' file"
 command = "bazelisk"
 args = ["run", "//:blackjack"]
-dependencies = ["clean"]
-
-[tasks.say-hello]
-script = [
-    "echo hello"
-]

@@ -21,21 +21,22 @@ mod expressions;                        // expressions parsing routines
 mod statements;                         // statements parsing routines
 mod items;                              // items data structures
 mod primitives;                         // common types
-mod program;                            // verifiable computation model and algorithms
+mod computation;                        // Abstraction over circuits and machines
 
 use quote::ToTokens;
 use syn::parse_macro_input;
 use crate::primitives::{InnerTokenStream, OuterTokenStream, ParseResult};
-use crate::program::Program;
+use crate::computation::Computation;
 
-/// Program (or verifiable computation) entry point
+/// Computation entry point
 ///
 /// Your verifiable computing adventure begins with this [procedural macro](https://doc.rust-lang.org/reference/procedural-macros.html).
-/// It is the entry point of a verifiable computation (hereafter coined as a [`Program`].
+/// A computation is a generic concept with accepts inputs, implements a body, and produces some
+/// output(s).
 ///
 /// ## Example
 /// ```no_compile
-/// program! (name) {
+/// computation! (name) {
 ///
 ///     witness {
 ///     }
@@ -48,7 +49,7 @@ use crate::program::Program;
 /// }
 /// ```
 #[proc_macro]
-pub fn program(input: InnerTokenStream) -> InnerTokenStream {
+pub fn computation(input: InnerTokenStream) -> InnerTokenStream {
     let program = parse_macro_input!(input as Program);
     InnerTokenStream::from(program.to_token_stream())
 }

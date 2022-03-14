@@ -4,6 +4,11 @@ description = "Woodoo language syntax analyzer"
 authors = ["Handcrafted since 2022 by Fumbo sorcerers"]
 version = "0.1.0"
 edition = "2021"
+categories = [
+    "language",
+    "cryptography"
+]
+
 keywords = [
     "woodoo",
     "fumbo",
@@ -13,7 +18,7 @@ keywords = [
     "verifiable-computing",
     "snark",
     "stark",
-    "zero-knoweledge-proof",
+    "zero-knowledge-proof",
     "cryptography",
     "zkp"
 ]

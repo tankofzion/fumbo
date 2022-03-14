@@ -1,0 +1,39 @@
+[package]
+name = "fumbo-platform-polkadot-verifier"
+description = "On-chain proof verifier for Polkadot Substrate FRAME"
+authors = ["Handcrafted since 2022 by Fumbo sorcerers"]
+version = "0.1.0"
+edition = "2021"
+keywords = [
+    "fumbo",
+    "platform",
+    "polkadot",
+    "substrate",
+    "verifiable-computing",
+    "proof-system",
+]
+
+readme = "README.md"
+license = "Apache-2.0"
+
+# User interaction (UI) tests driver
+[[test]]
+name = "tests"
+path = "tests/runner.rs"
+
+[dependencies]
+# Serialization dependencies
+serde = { version = "1.0", features = ["derive"] }
+
+# Procedural macro dependencies
+proc-macro2 = "1.0.36"
+proc-macro-error = "1.0.2"
+
+# Code analysis and synthesis dependencies
+syn = { version = "1.0.2", features = ["extra-traits", "full"] }
+quote = "1.0.15"
+
+[dev-dependencies]
+
+# User interaction (UI) testing dependencies
+trybuild = "1.0.56"

@@ -1,11 +1,12 @@
 [book]
-title = "The MrBig Book"
-authors = ["The MrBig Mobsters"]
+title = "Fumbo In-Depth"
+authors = ["Handcrafted since 2022 by Fumbo sorcerers"]
 multilingual = false
+language = "en"
 src = "contents"
 
 [build]
-build-dir="../target/book"
+build-dir="../../target/documents/book"
 
 [output.html.search]
 limit-results = 20
@@ -15,3 +16,8 @@ boost-hierarchy = 2
 boost-paragraph = 1
 expand = true
 heading-split-level = 2
+
+#[output.katex]
+
+#[preprocessor.katex]
+#macros = "macros.txt"

@@ -1,0 +1,27 @@
+[package]
+name = "fumbo-wallet-example"
+description = "Layer-3 wallet implementation"
+authors = [ "Handcrafted since 2022 by the Fumbo sorcerers"]
+version = "0.1.0"
+edition = "2021"
+keywords = [
+    "woodoo",
+    "fumbo",
+    "zk-stark",
+    "polkadot",
+    "substrate",
+    "finance",
+]
+readme = "README.md"
+license = "Apache-2.0"
+
+[dependencies]
+
+# Fumbo barrel crate
+#fumbo = { path = "", }
+
+# Woodoo dependencies
+woodoo-compiler = { path = "../../language/modules/compiler", version = "0.1.0" }
+
+# Third-party dependencies
+colored = "2.0.0"

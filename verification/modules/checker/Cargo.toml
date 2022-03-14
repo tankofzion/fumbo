@@ -1,0 +1,34 @@
+[package]
+name = "fumbo-checker"
+description = "Algebraic arithmetic circuit verification tool"
+authors = ["Handcrafted since 2022 by Fumbo sorcerers"]
+version = "0.1.0"
+edition = "2021"
+keywords = [
+    "fumbo",
+    "cli",
+    "formal_methods",
+    "verification",
+    "arithmetic_circuit",
+    "calculus",
+    "algebra"
+]
+
+readme = "README.md"
+license = "Apache-2.0"
+
+default-run = "fumbo-checker"
+
+# Compiler shell executable
+[[bin]]
+name = "fumbo-checker"
+path = "src/shell.rs"
+
+# Compiler driver library
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+
+# Third-party dependencies
+structopt = "0.3.26"

@@ -1,0 +1,36 @@
+[package]
+name = "woodoo-synthesizer"
+description = "Abstract computation graph (ACG) synthesizer"
+authors = ["Handcrafted since 2022 by Fumbo sorcerers"]
+version = "0.1.0"
+edition = "2021"
+categories = [ "language", "cryptography" ]
+keywords = [
+    "woodoo",
+    "fumbo",
+    "language",
+    "synthesizer",
+    "intermediate-representation",
+    "verifiable-computing",
+    "snark",
+    "stark",
+    "zero-knowledge-proof",
+    "cryptography",
+    "zkp"
+]
+readme = "README.md"
+license = "Apache-2.0"
+
+# User interaction (UI) tests driver
+[[test]]
+name = "tests"
+path = "tests/runner.rs"
+
+[dependencies]
+# Serialization dependencies
+serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+
+# User interaction (UI) testing dependencies
+trybuild = "1.0.56"

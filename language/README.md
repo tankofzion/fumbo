@@ -14,30 +14,65 @@ for guiding (with type-driven concepts) engineers
 
 ## Aims and Objectives
 
-Building verifiable computation solutions is a complex task, mainly due to the fact  that a computation problem must first 
-be translated into a constraint-based representation, such as, for instance, R1CS or QAP.
+Building verifiable computation solutions is a complex task. A computation problem must first be translated into a 
+constraint-based representation, such as, for instance, R1CS or QAP, before any computation proof can be made. Circuits 
+can be constructed either through compilation from a high-level language (e.g. Buffet, Pinocchio, Geppetto, TinyRAM...) 
+or manually, using low-level circuits engineering frameworks (e.g. Hawk, [jsnark](https://github.com/akosba/jsnark), 
+[libsnark](https://github.com/scipr-lab/libsnark)). While the handcrafted circuits offer better performance (i.e. fewer
+constraints) and lower-level control over the circuit structure, it is a tedious task for developers. In fact, it requires
+the developer to understand the semantics between native constraint ad non-native constraint type operations. `Woodoo` 
+aims at filling the gap, providing developers with a more abstract view of circuits and an expressive type-driven 
+compiler-assisted engineering toolkit which generates optimized and compact circuits.
 
-Unlike low-level circuits engineering tools, `Woodoo` is a mid-level abstraction making development
-easier. For instance, in the low-level [libsnark](https://github.com/scipr-lab/libsnark) library, a programmer represents 
-the verifiable program as [gadgets](https://github.com/scipr-lab/libsnark#gadget-libraries) that are connected together,
-each defining a set of constraints and how to set the value of its output variables. In `Woodoo`, an intuitive and efficient
-interface is provided to the developer, abstracting over the cryptographic backend and
-likely generating faster circuits than if they were hand coded.
+## Verifiable computation models
 
-## Syntax definition
+The main intent of `Woodoo` is to abstract over verifiable computation and proof of computational integrity models. The
+latter are usually classified as **circuit-based** (e.g. SNARK) or **machine-based** (e.g. STARK). The computation-to-circuit 
+and computation-to-machine transformation processes is a crucial part, that or the sequence of transformations for converting
+a computation to a mathematical statement. Circuits are represented as algebraic structures that can be transformed to various 
+underlying representations, including R1CS/QAP, for SNARK, and AIR (Algebraic Intermediate Representation), for STARK, 
+and are amenable to formal verification by means of algebraic reasoning techniques (like the polynomial calculus).
+Note that in STARK, the reduction of computations to AIR is coined [*arithmetization*](https://medium.com/starkware/arithmetization-i-15c046390862).
+It operates in two successive steps by first generating an execution trace and polynomial constraints and then
+transforming them to a single low-degree polynomial.
 
-The syntax of the `Woodoo` language is defined using abstract notation, each
-term being implemented as a Rust [procedural macro](https://doc.rust-lang.org/reference/procedural-macros.html).
+In a circuit, a (arithmetic) constraint is represented as a polynomial that is applied over the wires of the circuits, as used in R1CS,
+for instance. Concretely, R1CS is a structured system of equations over a large finite field (also called Galois field).
+R1CS can also express constraints on types, like applying type constraints on circuit variables.
 
-## Formal verification
+In order to build a ZKP proof, the synopsis is this one:
 
-There are currently two methods for formal verification. The traditional form uses a branch of mathematics called 
-type theory, such as, for instance, the Martin-Löf intuitionist approach. If the code works, the verification will 
-generate a mathematical proof of correctness. This method is therefore rigorous but, for various reasons, impractical to
-use. A second method is **type systems for refinements**, that can be developed in common programming languages, even
-using their respective meta-programming features (like we do in this project with Rust procedural
-macros). This is a practical form of verification and can be integrated in the software, but it lacks the strong mathematical 
-foundation of type theory.
+Statement    -->    transformation      --> Intermediate       -->  proof system    -->  Proof
+y = f(x,w)          (frontend)            representation           (backend)
+
+Intermediate representation (e.g. AIR, R1CS, or any logical constraints' system) is crucial, as it can incur big overhead
+if not properly structured. One big advantage of R1CS is that it provides linear-algebraic structure to work with, hence 
+simplifying the backend (or proof system).
+
+Let's get back to the intermediate representation (IR) notion and compare algebraic intermediate representation (AIR) as
+used in STARK and R1CS (Rank 1 Constraint System), that is used by SNARK flavors.
+
+|                        |                                                    AIR                                                    |                          R1CS                           |
+|------------------------|:---------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------:|
+| **Computation model**  |                                               machine-based                                               |                      circuit-based                      |
+| **Technique**          |                                              convert program                                              |                     unroll circuit                      |
+| **Polynomials degree** |                                             arbitrary degree                                              |                   degree 2 and rank 1                   |
+| **System size**        | as large as the size of the program describing the system (program is often much shorter than the system) | as large as the computation size (i.e. number of steps) |
+
+Proof recursion means that a prover ran a verifier and that verifier verifies some other provers that verify the prover
+and so on, recursively. Both R1CS and AIR formalisms can express proof recursions.
+
+### Succinct programs
+
+## Category theory and computations
+
+Relying on category theory, formal models of computation and cryptography are put together, providing a mathematical way 
+to turn categorical computational models (including circuits and machines) into zk-SNARKs or zk-STARKs, that verify how 
+a sequence of inputs leading to a state change follows the rules specified by the categorical computation model (using
+morphisms).
+
+In this project, a **computation** is a convenient abstraction over circuits and machines, so that to ease the mapping to 
+different proof systems (also called backends).
 
 ## Type checking and inference
 
@@ -45,3 +80,18 @@ foundation of type theory.
 
 ## References
 
+Brendan **FONG** and David I. **SPIVAK** (2019) An Invitation to Applied Category Theory: Seven Sketchees in Compositionality. Cambridge University Press.
+
+Fabrizio **GENOVESE**, Andre **KNIPSEL** and Joshua **FITZGERALD** (2019) Mapping finite state machines to zk-SNARKS Using Category Theory. ArXiv:1909.02893, https://arxiv.org/abs/1909.02893
+
+Bartosz **MILEWSKI** (2019) Category Theory for Programmers. 
+
+David I. **SPIVAK** (2014) Category Theory for the Sciences. The MIT Press.
+
+Bobbin **THREADBARE**. AirAssembly: a low-level language for encoding AIR of computations
+
+### Useful Links
+
+- Awesome zero knowledge proofs (zkp) - https://github.com/matter-labs/awesome-zero-knowledge-proofs
+- CirC compiler - https://github.com/circify/circ
+- Typedefs - Language agnostic type system based on category theory and polynomials. https://typedefs.com/

@@ -1,5 +1,5 @@
 [package]
-name = "woodoo-circuitry"
+name = "fumbo-circuitry"
 description = "Library of data structures and algorithms for algebraic circuits manipulation"
 authors = ["Handcrafted since 2022 by Fumbo sorcerers"]
 version = "0.1.0"

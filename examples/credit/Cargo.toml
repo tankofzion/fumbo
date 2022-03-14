@@ -1,0 +1,33 @@
+[package]
+name = "fumbo-credit-example"
+description = "Decentralized autonomous credit scoring organization"
+authors = [ "Handcrafted since 2022 by the Fumbo sorcerers"]
+version = "0.1.0"
+edition = "2021"
+categories = ["finance"]
+keywords = [
+    "woodoo",
+    "fumbo",
+    "zk-snark",
+    "zk-stark",
+    "polkadot",
+    "substrate",
+    "credit-scoring",
+    "multi-party-computation",
+    "credit-scoring",
+    "decentralized-credit-bureau",
+    "decentralized-finance"
+]
+readme = "README.md"
+license = "Apache-2.0"
+
+[dependencies]
+
+# Fumbo barrel crate
+#fumbo = { path = "", }
+
+# Woodoo dependencies
+woodoo-compiler = { path = "../../language/modules/compiler", version = "0.1.0" }
+
+# Third-party dependencies
+colored = "2.0.0"

@@ -16,13 +16,20 @@ members = [
     "language/modules/typer",                   # Type checking and inference
     "language/modules/evaluator",               # Type-driven program semantics analyzer
     "language/modules/optimizer",               # Multi-strategies arithmetic circuits optimizer
+    "language/modules/synthesizer",             # Abstract computation model (ACG) synthesizer
 
-    # Language examples
-    "language/examples/merkletree",             # Check Merkle tree membership
-    "language/examples/sudoku",                 # Proof of a Sudoku solution
-    "language/examples/square",                 # Mystic square (or 15-puzzle) solution proof
-    "language/examples/zerocash",               # ZeroCash Pour circuit
-    "language/examples/portfolio"               # Portfolio valuation
+    # Platform
+    "platform/substrate/verifier",              # Substrate FRAME verifier module
+
+    # Inspiring examples
+    "examples/merkletree",                      # Check Merkle tree membership
+    "examples/sudoku",                          # Proof of a Sudoku solution
+    "examples/square",                          # Mystic square (or 15-puzzle) solution proof
+    "examples/zerocash",                        # ZeroCash Pour circuit
+    "examples/portfolio",                       # Portfolio valuation
+
+    # Formal circuit verification
+    "verification/modules/checker",             # Circuit checker shell (or command-line interface - CLI)
 ]
 
 # Development compiler settings
@@ -31,7 +38,6 @@ opt-level = 1                                   # Basic optimizations are applie
 panic = "abort"
 split-debuginfo = "unpacked"                    # Place debug information adjacent to the executable (on MacOS 'unpacked'
                                                 # is the default)
-
 # Releasing compiler settings
 [profile.release]
 opt-level = 3                                   # Apply all code optimizations (longer compilation)
