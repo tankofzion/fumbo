@@ -11,10 +11,11 @@ and financial underwriting.
 
 This table briefly describes the major components of the `Fumbo` project.
 
-| Component                | Description                                                                  |
-|--------------------------|------------------------------------------------------------------------------|
-| [`language`](./language) | Implementation of the `Woodoo` language.                                     |
-| [`platform`](./platform) | Integration with blockchain platforms (e.g. Polkadot, Ethereum, Solana, ...) |
+| Component                    | Description                                                                  |
+|------------------------------|------------------------------------------------------------------------------|
+| [`language`](./language)     | Implementation of the `Woodoo` language.                                     |
+| [`platform`](./platform)     | Integration with blockchain platforms (e.g. Polkadot, Ethereum, Solana, ...) |
+| [`playground`](./playground) | Interactive interpreter for experimenting with the `Woodoo` language         |
 
 ## Project building
 
@@ -110,5 +111,5 @@ The resulting book is generated in [./target/documents/book](./target/documents/
 
 ## References
 
-Alex **OZDEMIR** and Dan **BONEH** (February 22, 2022) Experimenting wit h Collaborative zk-SNARKs: Zero-Knowledge Proofs for Distributed 
-Secrets. Cryptology ePrint Archive: Report 2021/1530. https://eprint.iacr.org/2021/1530.pdf.
+Alex **OZDEMIR** and Dan **BONEH** (February 22, 2022) Experimenting with collaborative zk-SNARKs: Zero-knowledge proofs 
+for distributed secrets. Cryptology ePrint Archive: Report 2021/1530. https://eprint.iacr.org/2021/1530.pdf.

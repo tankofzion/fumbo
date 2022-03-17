@@ -7,8 +7,15 @@
 ########################################################################################################################
 
 [workspace]
+
+# Required for workspaces
+# per <https://doc.rust-lang.org/edition-guide/rust-2021/default-cargo-resolver.html#details>
 resolver = "2"
+
 members = [
+
+    # Common data structures and algorithms
+#    "commons/categories",                       # Category theory library
 
     # Language modules
     "language/modules/compiler",                # Language compiler (or CLI)
@@ -28,8 +35,11 @@ members = [
     "examples/zerocash",                        # ZeroCash Pour circuit
     "examples/portfolio",                       # Portfolio valuation
 
-    # Formal circuit verification
-    "verification/modules/checker",             # Circuit checker shell (or command-line interface - CLI)
+    # Formal computations checker
+    "verification/modules/checker",             # Computations checker shell (or command-line interface - CLI)
+
+    # Tools
+    "playground",                               # Interactive interpreter (or REPL) for playing with Woodoo language
 ]
 
 # Development compiler settings

@@ -1,0 +1,40 @@
+[package]
+name = "fumbo-playground"
+description = "Woodoo language playground (or interactive interpreter)"
+authors = ["Handcrafted since 2022 by Fumbo sorcerers"]
+version = "0.1.0"
+edition = "2021"
+categories = ["language", "cryptography"]
+keywords = [
+    "woodoo",
+    "fumbo",
+    "language",
+    "interpreter",
+    "playground",
+    "cli",
+    "wasm",
+    "repl",
+    "verifiable-computing"
+]
+readme = "README.md"
+license = "Apache-2.0"
+
+default-run = "fumbo-playground"
+
+# Playground library
+[lib]
+path = "src/lib.rs"
+
+# Playground (standalone) application
+[[bin]]
+name = "fumbo-playground"
+path = "src/main.rs"
+
+[dependencies]
+env_logger = { version = "0.9", default-features = false }
+log = "0.4.1"
+rustyline = "9.1.2"
+rustyline-derive = "0.6.0"
+regex = "1.5.5"
+thiserror = "1.0.30"
+anyhow = "1.0.56"
