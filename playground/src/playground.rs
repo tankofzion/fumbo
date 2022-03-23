@@ -1,7 +1,8 @@
-use std::borrow::Cow;
+use std::borrow::{BorrowMut, Cow};
 use std::borrow::Cow::{Borrowed, Owned};
 use std::collections::HashMap;
-use rustyline::{At, Cmd, CompletionType, Config, Context, EditMode, Editor, KeyCode, KeyEvent, Modifiers, Movement, Result as PlaygroundResult, Word};
+use rustyline::config::Configurer;
+use rustyline::{At, Cmd, CompletionType, Config, Context, EditMode, Editor, KeyCode, KeyEvent, Modifiers, Movement, Word};
 use rustyline::completion::{Completer, FilenameCompleter, Pair};
 use rustyline::error::ReadlineError;
 use rustyline::highlight::{Highlighter, MatchingBracketHighlighter};
@@ -9,12 +10,15 @@ use rustyline::hint::{Hinter, HistoryHinter};
 use rustyline::validate::{self, MatchingBracketValidator, Validator};
 use rustyline_derive::Helper;
 
-use crate::Command;
+use crate::command::Command;
+use crate::context::Context as PlaygroundContext;
+use crate::error::{PlaygroundError, PlaygroundResult};
 
-const PROMPT: &str = ">> ";
+// Default shell prompt
+const PROMPT: &str = "Woodoo >> ";
 
 #[derive(Helper)]
-struct PlaygroundHelper {
+pub struct PlaygroundHelper {
     completer: FilenameCompleter,
     highlighter: MatchingBracketHighlighter,
     validator: MatchingBracketValidator,
@@ -77,59 +81,53 @@ impl Validator for PlaygroundHelper {
     }
 }
 
+/// Playground structure
+pub struct Playground<'p> {
+    /// Application name
+    name: &'p str,
 
-#[derive(Default)]
-pub struct Playground<Context> {
-    name: String,
-    version: String,
-    description: String,
-    commands: HashMap<String, Command>,
+    /// Application's version number (using semantic versioning format, namely 'major.minor.patch')
+    version: &'p str,
+
+    /// Short application description
+    description: &'p str,
+
+    /// Application commands
+    commands: HashMap<&'p str, Command<'p>>,
+
+    /// Application's command-line arguments
+    arguments: &'p [String],
+
+    // Reference to readline editor
+    editor: Editor<PlaygroundHelper>,
+
+    /// Auto-completion (using tab character, usually) support flag
     completion: bool,
-    context: Context,
 }
 
-impl <Context> Playground<Context>  {
+// Implement playground methods
+impl <'p> Playground<'p>  {
 
-    /// Build a new interpreter instance, providing its configuration
-    pub fn new(context: Context) -> Self {
-        Playground {
-            name: String::new(),
-            version: String::new(),
-            description: String::new(),
-            commands: HashMap::new(),
-            completion: false,
-            context,
-        }
+    /// Build and configure a new playground instance
+    pub fn new() -> Self {
+
+        let playground = Self {
+            name: Default::default(),
+            version: Default::default(),
+            description: Default::default(),
+            commands: Default::default(),
+            arguments: &[],
+            editor: Editor::<PlaygroundHelper>::new(),
+            completion: true
+        };
+
+        playground.configure()
     }
 
-    /// Set playground name
-    pub fn name(mut self, name: &str) -> Self {
-        self.name = name.to_string();
-        self
-    }
+    // Configure playground
+    fn configure(mut self) -> Self {
 
-    /// Set playground version
-    pub fn version(mut self, version: &str) -> Self {
-        self.version = version.to_string();
-        self
-    }
-
-    /// Set playground description
-    pub fn description(mut self, description: &str) -> Self {
-        self.description = description.to_string();
-        self
-    }
-
-    /// Add a new command
-    pub fn command(mut self, command: Command) -> Self {
-        self.commands.insert(command.name.clone(), command);
-        self
-    }
-
-    /// Start the playground loop
-    pub fn execute(&mut self) -> PlaygroundResult<()> {
-        env_logger::init();
-
+        // Set line editor helpers
         let helper = PlaygroundHelper {
             completer: FilenameCompleter::new(),
             highlighter: MatchingBracketHighlighter::new(),
@@ -138,34 +136,75 @@ impl <Context> Playground<Context>  {
             prompt: PROMPT.to_owned(),
         };
 
-        let configuration = Config::builder()
-            .history_ignore_space(true)
-            .completion_type(CompletionType::List)
-            .edit_mode(EditMode::Emacs)
-            .build();
+        self.editor.set_helper(Some(helper));
 
-        // build input line editor
-        let mut editor = Editor::<PlaygroundHelper>::with_config(configuration);
+        // Set basic line editor settings
+        self.editor.set_history_ignore_space(true);
+        self.editor.set_completion_type(CompletionType::List);
+        self.editor.set_edit_mode(EditMode::Emacs);
 
-        editor.set_helper(Some(helper));
-        editor.bind_sequence(KeyEvent::alt('n'), Cmd::HistorySearchForward);
-        editor.bind_sequence(KeyEvent::alt('p'), Cmd::HistorySearchBackward);
-        editor.bind_sequence(
+        // Bind keyboard sequences to some line editor functions
+        self.editor.bind_sequence(
+            KeyEvent::alt('n'),
+            Cmd::HistorySearchForward);
+        self.editor.bind_sequence(
+            KeyEvent::alt('p'),
+            Cmd::HistorySearchBackward);
+        self.editor.bind_sequence(
             KeyEvent(KeyCode::Left, Modifiers::CTRL),
             Cmd::Move(Movement::BackwardWord(1, Word::Big)),
         );
-        editor.bind_sequence(
+        self.editor.bind_sequence(
             KeyEvent(KeyCode::Right, Modifiers::CTRL),
             Cmd::Move(Movement::ForwardWord(1, At::AfterEnd, Word::Big)),
         );
 
-        // reload editor's history
-        if editor.load_history("history.txt").is_err() {
+        // Load line editor history (from a file)
+        if self.editor.load_history("history.txt").is_err() {
             println!("No previous history.");
         }
 
+        self
+    }
+
+    /// Set playground name
+    pub fn name<T: Into<&'p str>>(mut self, name: T) -> Self {
+        self.name = name.into();
+        self
+    }
+
+    /// Set playground version
+    pub fn version<T: Into<&'p str>>(mut self, version: T) -> Self {
+        self.version = version.into();
+        self
+    }
+
+    /// Set a short playground description
+    pub fn description<T: Into<&'p str>>(mut self, description: T) -> Self {
+        self.description = description.into();
+        self
+    }
+
+    /// Add a new command to the playground
+    pub fn command(mut self, command: Command<'p>) -> Self {
+        self.commands.insert(command.name.clone(), command);
+        self
+    }
+
+    /// Returns a mutable reference to the inner readline editor object
+    pub fn editor(&mut self) -> &mut Editor<PlaygroundHelper> {
+         &mut self.editor
+    }
+
+    /// Start the playground loop, providing command-line arguments
+    pub fn run(&mut self, arguments: &'p [String]) -> rustyline::Result<()> {
+        env_logger::init();
+
+        // Save command-line arguments
+        self.arguments = arguments;
+
         // let mut opt_history_file = None;
-        // let config_dir = evcxr::config_dir();
+        // let config_dir = playground::config_dir();
         // if let Some(config_dir) = &config_dir {
         //     fs::create_dir_all(config_dir).ok();
         //     let history_file = config_dir.join("history.txt");
@@ -173,24 +212,24 @@ impl <Context> Playground<Context>  {
         //     opt_history_file = Some(history_file);
         // }
 
-        println!("Welcome to {} v{}", "Fumbo Playground", self.version);
-        println!("Handcrafted since 2022 by Fumbo sorcerers");
+        // Display a welcome message
+        self.welcome();
 
         // enter the line processing loop
         loop {
             let prompt = format!("{}", PROMPT);
-            editor.helper_mut().expect("No helper").prompt = format!("\x1b[1;32m{}\x1b[0m", prompt);
-            let line = editor.readline(&prompt);
+            self.editor.helper_mut().expect("No helper").prompt = format!("\x1b[1;32m{}\x1b[0m", prompt);
+
+            let line = self.editor.readline(&prompt);
             match line {
                 Ok(line) => {
-                    editor.add_history_entry(line.as_str());
-                    if let Err(error) = self.handle_line(&line.to_string()) {
-                       // (self.error_handler)(error, self)?;
+                    self.editor.add_history_entry(line.as_str());
+                    if let Err(error) = self.process_line(&line.to_string()) {
                         eprintln!("Error {:?} in line: {}", error, line);
                     }
                 }
                 Err(ReadlineError::Interrupted) => {
-                    println!("Interrupted");
+                    println!("\nInterrupted!");
                     break;
                 }
                 Err(ReadlineError::Eof) => {
@@ -206,12 +245,75 @@ impl <Context> Playground<Context>  {
         }
 
         // save history of commands
-        editor.append_history("history.txt")
+        self.editor.append_history("history.txt")
     }
 
-    // Process given input line
-    fn handle_line(&mut self, line: &str) -> PlaygroundResult<()> {
-        println!("Line: {}", line);
+    // Process given input line content and execute command action
+    fn process_line(&mut self, line: &str) -> PlaygroundResult<()> {
+        let trimmed_line = line.trim();
+
+        if !trimmed_line.is_empty() {
+            let content = regex::Regex::new(r#"("[^"\n]+"|[\S]+)"#).unwrap();
+            let arguments = content
+                .captures_iter(trimmed_line)
+                .map(|a| a[0].to_string().replace("\"", ""))
+                .collect::<Vec<String>>();
+
+            let mut arguments = arguments.iter().fold(vec![], |mut state, a| {
+                state.push(a.as_str());
+                state
+            });
+
+            let command: String = arguments.drain(..1).collect();
+
+            self.execute_command(&command, &arguments)?;
+        }
+
         Ok(())
+    }
+
+    // Execute a given command
+    fn execute_command(&mut self, name: &str, arguments: &[&str]) -> PlaygroundResult<()> {
+
+        // Process basic buit-in commands first
+        match self.commands.get(name) {
+            Some(command) => {
+                command.execute(&mut PlaygroundContext::new(self, arguments));
+            }
+            None => {
+                return Err(PlaygroundError::UnknownCommand(name.to_string()));
+            }
+        }
+
+        Ok(())
+    }
+
+    // Display welcome message
+    fn welcome(&self) {
+        println!("\nWelcome to {} v{}", self.name, self.version);
+        println!("Handcrafted since 2022 by Fumbo sorcerers\n");
+        println!("For help, enter 'help'");
+    }
+
+    /// Display basic help message
+    pub fn display_help(&self) {
+        println!("Show help");
+    }
+
+    /// Display version
+    pub fn display_version(&self) {
+        println!("v{}", self.version);
+    }
+
+    /// Display the list of commands stored in history cache
+    pub fn display_history(&self) {
+        let history= self.editor.history();
+        if ! history.is_empty() {
+            let mut count = 0;
+            for entry in history {
+                println!("{}: {}", count, entry);
+                count += 1;
+            }
+        }
     }
 }

@@ -2,21 +2,8 @@
 
 use thiserror::Error;
 
-use crate::Playground;
-
 /// Result type
-pub type PlaygroundResult<ReturnType> = std::result::Result<ReturnType, PlaygroundError>;
-
-/// Error handling function
-pub type ErrorHandler<Context, ErrorType> = fn(playground: &Playground<Context>, error: ErrorType) -> PlaygroundResult<()>;
-
-/// Default error handling function
-pub fn default_error_handler<Context>(
-    _playground: &Playground<Context>,
-    error: PlaygroundError) -> PlaygroundResult<()> {
-    eprintln!("Error: ${:?}", error);
-    Ok(())
-}
+pub type PlaygroundResult<T> = std::result::Result<T, PlaygroundError>;
 
 /// Error codes enumeration
 ///

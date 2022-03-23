@@ -16,12 +16,12 @@
 //! }
 //!
 //! fn main() {
-//!    let mut playground = Playground::new(())
+//!    let mut playground = Playground::new()
 //!         .name(crate_name!())
 //!         .version(crate_version!())
 //!         .description(crate_description!())
 //!         .command(
-//!              Command::new("hello", hello)
+//!              Command::new("hello")
 //!                  .parameter(Parameter::new("who").set_required(true)?)?
 //!                  .help("Greetings!"),
 //!     );
@@ -34,9 +34,11 @@
 //! ```
 
 mod command;
+mod context;
 mod error;
 mod playground;
 
 // Re-export main components in crate namespace
 pub use command::Command;
+pub use context::Context;
 pub use playground::Playground;
